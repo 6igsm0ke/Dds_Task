@@ -1,4 +1,3 @@
-from .services import validate_subcategory_and_category, validate_category_and_type
 from .models import *
 from rest_framework import serializers
 
@@ -46,7 +45,7 @@ class TransactionSerializer(serializers.ModelSerializer):
             "amount",
             "comment",
         ]
-        
+
         extra_kwargs = {
             "amount": {"required": True},
             "type": {"required": True},
@@ -62,7 +61,3 @@ class TransactionSerializer(serializers.ModelSerializer):
         data["subcategory"] = SubCategorySerializer(instance.subcategory).data
         return data
 
-    def validate(self, data):
-        validate_subcategory_and_category(data["category"], data["subcategory"])
-        validate_category_and_type(data["category"], data["type"])
-        return data
