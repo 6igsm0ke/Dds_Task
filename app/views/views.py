@@ -3,6 +3,7 @@ from app.models import *
 from rest_framework.viewsets import ModelViewSet
 from app.serializers import *
 
+# Вьюшки для моделек чтобы создать ендпойнты
 
 # Create your views here.
 class TransactionViewSet(ModelViewSet):

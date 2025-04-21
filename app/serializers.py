@@ -1,6 +1,7 @@
 from .models import *
 from rest_framework import serializers
 
+# Сериализаторы для моделей
 
 class StatusSerializer(serializers.ModelSerializer):
     class Meta:

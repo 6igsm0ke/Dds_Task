@@ -2,7 +2,7 @@ from django import forms
 from .models import Transaction
 from .services import validate_subcategory_and_category, validate_category_and_type
 
-
+# Форма для создания Транзакции
 class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction

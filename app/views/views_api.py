@@ -3,8 +3,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from app.models import *
 from django.http import JsonResponse
 
-
-
+# Главная страница с фильтрацией по параметрам
 def index_view(request):
     filters = {
         "name__icontains": request.GET.get("name"),
@@ -14,7 +13,7 @@ def index_view(request):
         "category__name__icontains": request.GET.get("category"),
         "subcategory__name__icontains": request.GET.get("subcategory"),
     }
-    filters = {k: v for k, v in filters.items() if v}
+    filters = {k: v for k, v in filters.items() if v}  # удаляем пустые
     transactions = Transaction.objects.filter(**filters)
 
     context = {
@@ -28,6 +27,7 @@ def index_view(request):
     return render(request, "app/index.html", context)
 
 
+# Страница создания транзакции
 def transaction_create_view(request):
     if request.method == "POST":
         form = TransactionForm(request.POST)
@@ -41,6 +41,7 @@ def transaction_create_view(request):
     )
 
 
+# Управление справочниками
 def manage_dictionaries_view(request):
     model_map = {
         "Статусы": Status,
@@ -53,21 +54,25 @@ def manage_dictionaries_view(request):
         model_name = request.POST.get("model")
         name = request.POST.get("name")
 
+        # Категория привязана к типу
         if model_name == "Категории":
             type_id = request.POST.get("type_id")
             if name and type_id:
                 Category.objects.create(name=name, type_id=type_id)
 
+        # Подкатегория привязана к категории
         elif model_name == "Подкатегории":
             category_id = request.POST.get("category_id")
             if name and category_id:
                 SubCategory.objects.create(name=name, category_id=category_id)
 
+        # Простой случай: статус и тип
         elif model_name in model_map and name:
             model_map[model_name].objects.create(name=name)
 
         return redirect("app:manage_dictionaries")
 
+    # Данные для шаблона
     dictionaries = {
         "Статусы": Status.objects.all(),
         "Типы": TransactionType.objects.all(),
@@ -88,6 +93,7 @@ def manage_dictionaries_view(request):
     )
 
 
+# Редактирование транзакции
 def transaction_edit_view(request, uuid):
     instance = Transaction.objects.get(uuid=uuid)
     if request.method == "POST":
@@ -104,25 +110,30 @@ def transaction_edit_view(request, uuid):
     )
 
 
+# Удаление транзакции
 def transaction_delete_view(request, uuid):
     transaction = get_object_or_404(Transaction, uuid=uuid)
     transaction.delete()
     return redirect("app:index")
 
+
+# Получить категории по типу — для динамической подгрузки на фронте
 def get_categories_by_type(request):
     type_id = request.GET.get("type")
     categories = Category.objects.filter(type_id=type_id)
     data = [{"id": c.id, "name": c.name} for c in categories]
     return JsonResponse(data, safe=False)
 
+
+# Получить подкатегории по категории
 def get_subcategories_by_category(request):
     category_id = request.GET.get("category")
     subcategories = SubCategory.objects.filter(category_id=category_id)
     data = [{"id": s.id, "name": s.name} for s in subcategories]
     return JsonResponse(data, safe=False)
 
-from django.shortcuts import get_object_or_404
 
+# Редактирование элемента справочника (для всех моделей)
 def edit_dictionary_item(request, model, pk):
     model_map = {
         "Статусы": Status,
@@ -144,6 +155,7 @@ def edit_dictionary_item(request, model, pk):
         if new_name:
             instance.name = new_name
 
+            # Обновляем связь, если надо
             if model == "Категории" and related_id:
                 instance.type_id = related_id
             elif model == "Подкатегории" and related_id:
@@ -160,7 +172,7 @@ def edit_dictionary_item(request, model, pk):
     })
 
 
-
+# Удаление элемента справочника
 def delete_dictionary_item(request, model, pk):
     model_map = {
         "Статусы": Status,

@@ -1,6 +1,6 @@
 from django.forms import ValidationError
 
-
+# Бизнес правила
 def validate_subcategory_and_category(category, subcategory):
     if subcategory.category != category:
         raise ValidationError("Подкатегория не относится к выбранной категории.")
