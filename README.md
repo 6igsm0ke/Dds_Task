@@ -72,7 +72,7 @@ dds_task/
 
 ```bash
 # 1. Клонируй проект
-git clone https://github.com/your_username/dds_tracker.git
+git clone https://github.com/6igsm0ke/dds_tracker.git
 cd dds_tracker
 
 # 2. Создай и активируй виртуальное окружение
